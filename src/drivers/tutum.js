@@ -8,8 +8,10 @@ module.exports = exports = function() {
 	 */
 	var Tutum = function(options) {
 		this._api = process.env.TUTUM_SERVICE_API_URL;
-		if(!this._api) {
-			throw new Error('The Tutum API URL was not specified for this service.');
+		this._auth = process.env.TUTUM_AUTH;
+
+		if(!this._api || !this._auth) {
+			throw new Error('The Tutum API URL or auth key was not specified for this service.');
 		}
 
 		this._callbacks = {
@@ -35,7 +37,13 @@ module.exports = exports = function() {
 	 * Get the available services that can be added to the load balancer
 	 */
 	Tutum.prototype.getAvailableServices = function() {
-		return request.getAsync(this._api)
+		return request.getAsync({
+			url: this._api,
+			headers: {
+				'Authorization': this._auth,
+				'Accept': 'application/json'
+			}
+		})
 			.spread(function(response, data) {
 				return JSON.parse(data);
 			})
