@@ -1,0 +1,13 @@
+{
+  "name": "haproxy-ui",
+  "description": "UI and basic API server to manage HAProxy.",
+  "dependencies": {
+    "basic-auth": "^1.0.1",
+    "bluebird": "^2.9.26",
+    "body-parser": "^1.12.4",
+    "ejs": "^2.3.1",
+    "electrolyte": "0.0.6",
+    "express": "^4.12.4",
+    "request": "^2.56.0"
+  }
+}

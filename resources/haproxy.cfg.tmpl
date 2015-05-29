@@ -1,0 +1,33 @@
+global
+    daemon
+    maxconn 256
+
+defaults
+    mode http
+    timeout connect 5000ms
+    timeout client 50000ms
+    timeout server 50000ms
+
+frontend http-in
+    bind *:80
+
+    # Hosts
+    <% for(var i = 0; i < services.length; i++) { var service = services[i]; %>
+    acl host_<%= service.id %> hdr(host) -i <%= service.domain %>
+    <% } %>
+
+    # Assigning backends to hosts
+    <% for(var i = 0; i < services.length; i++) { var service = services[i]; %>
+    use_backend <%= service.id %> if host_<%= service.id %>
+    <% } %>
+
+<% for(var i = 0; i < services.length; i++) { var service = services[i]; %>
+backend <%= service.id %>
+    <% if (service.healthcheck) { %>
+    option httpchk GET <%= service.healthcheck %>
+    <% } %>
+    balance <% if(service.assignmentType) { %><%= service.assignmentType %><% } else { %>roundrobin<% } %>
+    <% for(var s = 0; s < service.servers.length; s++) { var server = service.servers[s]; %>
+    server <%= server.id %> <%= server.host %>:<%= server.port %>
+    <% } %>
+<% } %>
